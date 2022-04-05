@@ -1,4 +1,9 @@
 <div class="m-3">
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+        Create Post
+    </button>
+
     <table class="table">
         <thead>
             <tr class="text-center">
@@ -38,6 +43,32 @@
             </div>
             <div class="modal-footer">
 
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Create Post Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="createPost">
+                    <input type="text" class="form-control" id="search" formControlName="title"
+                        placeholder="Enter title">
+                    <input type="text" class="form-control mt-3" id="search" formControlName="body"
+                        placeholder="Enter Body">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" (click)="addPost()" data-bs-dismiss="modal">Create
+                    Post</button>
             </div>
         </div>
     </div>

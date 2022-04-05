@@ -32,7 +32,24 @@ export class InfoComponent implements OnInit {
       }
     }`
 
-  constructor(private apollo: Apollo, private fb: FormBuilder, private toastr: ToastrService) { }
+  
+  //create Post 
+  public crePost = gql`mutation(
+    $input: CreatePostInput!
+  ) {
+    createPost(input: $input) {
+      id
+      title
+      body
+    }
+  }`
+
+  constructor(private apollo: Apollo, private fb: FormBuilder, private toastr: ToastrService) {
+    this.createPost = this.fb.group({
+      title: '',
+      body: ''
+    });
+   }
 
   ngOnInit(): void {
     this.apollo.watchQuery({
@@ -54,5 +71,21 @@ export class InfoComponent implements OnInit {
         this.body = e.body;
       }
     });
+  }
+
+
+  public addPost() {
+    this.apollo.mutate({
+      mutation: this.crePost,
+      variables: {
+        input: {
+          title: this.createPost.value.title,
+          body: this.createPost.value.body
+        }
+      }
+    }).subscribe(data => {
+      console.log('data :>> ', data);
+    })
+    console.log('this.create', this.createPost.value)
   }
 }
