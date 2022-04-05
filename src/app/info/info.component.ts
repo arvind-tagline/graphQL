@@ -44,6 +44,11 @@ export class InfoComponent implements OnInit {
     }
   }`
 
+  //delete Post
+  public deletePost = gql`mutation ($id: ID!)   {
+    deletePost(id: $id)
+  }`
+
   constructor(private apollo: Apollo, private fb: FormBuilder, private toastr: ToastrService) {
     this.createPost = this.fb.group({
       title: '',
@@ -73,7 +78,7 @@ export class InfoComponent implements OnInit {
     });
   }
 
-
+//Create post
   public addPost() {
     this.apollo.mutate({
       mutation: this.crePost,
@@ -88,4 +93,20 @@ export class InfoComponent implements OnInit {
     })
     console.log('this.create', this.createPost.value)
   }
+
+
+//delete post
+  public delPost(id: any) {
+    console.log('id', id);
+
+    this.apollo.mutate({
+      mutation: this.deletePost,
+      variables: {
+        id: id
+      }
+    }).subscribe(data => {
+      console.log('data', data)
+    })
+  }
+
 }
