@@ -1,16 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Apollo, gql } from 'apollo-angular';
 import { ToastrService } from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
 
 @Component({
   selector: 'app-info',
   templateUrl: './info.component.html',
   styleUrls: ['./info.component.scss']
 })
-export class InfoComponent implements OnInit {
+export class InfoComponent implements OnInit, AfterViewInit {
 
-  public searchText: string = '';
+  // public searchText: string = '';
+  @ViewChild('searchText') searchText!: ElementRef;
   public createPost!: FormGroup;
   public updatePostF!: FormGroup;
   public getAllData: any;
@@ -53,18 +55,25 @@ export class InfoComponent implements OnInit {
   }`
 
   //Update Post
-  public updatePostQL = gql`
-  
-  mutation (
-  $id: ID!,
-  $input: UpdatePostInput!
-) {
-  updatePost(id: $id, input: $input) {
-    id
-    body
-  }
-}
-`
+  public updatePostQL = gql`mutation ($id: ID!, $input: UpdatePostInput!) {
+    updatePost(id: $id, input: $input) {
+      id
+      body
+    }
+  }`
+
+  //Filter post data start 
+  public filter = gql`
+  query Posts($options: PageQueryOptions) {
+    posts(options: $options) {
+      data {
+        id
+        title
+        body
+      }
+    }
+  }`
+
   constructor(private apollo: Apollo, private fb: FormBuilder, private toastr: ToastrService) {
     this.createPost = this.fb.group({
       title: '',
@@ -78,15 +87,26 @@ export class InfoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getAllPosts();
+  }
+
+  ngAfterViewInit() {
+    this.search()
+  }
+
+  public getAllPosts() {
     this.apollo.watchQuery({
       query: this.getData,
     }).valueChanges.subscribe((res: any) => {
-      this.getAllData = res.data.posts.data;
-      this.toastr.success('Show Posts Succefully');
-      console.log('res', res.data.posts.data);
+      if (res) {
+        this.getAllData = res.data.posts.data;
+        // this.toastr.success('Show Posts Succefully');
+        console.log('res', res.data.posts.data);
+      } else {
+        this.toastr.error('Please Try Again');
+      }
     });
   }
-
 
   // Show data by id
   public open(id: string) {
@@ -110,7 +130,12 @@ export class InfoComponent implements OnInit {
         }
       }
     }).subscribe(data => {
-      console.log('data :>> ', data);
+      if (data) {
+        console.log('data :>> ', data);
+        this.toastr.success('Added post successfully');
+      } else {
+        this.toastr.error('Please Try Again');
+      }
     })
     console.log('this.create', this.createPost.value)
   }
@@ -123,11 +148,17 @@ export class InfoComponent implements OnInit {
       variables: {
         id: id
       }
-    }).subscribe(data => {
-      console.log('data', data)
+    }).subscribe(del => {
+      if (del) {
+        this.toastr.success('Deleted Post successfully')
+        console.log('delete', del)
+      } else {
+        this.toastr.error('Please Try Again', 'Post Not Deleted.');
+      }
     })
   }
 
+  //Update Post start
   public getPostId(id: any) {
     this.postId = id;
     this.open(id);
@@ -141,13 +172,49 @@ export class InfoComponent implements OnInit {
     this.apollo.mutate({
       mutation: this.updatePostQL,
       variables: {
-      id: id,
+        id: id,
         input: {
           body: this.updatePostF.value.body
         }
       }
     }).subscribe(update => {
-      console.log('update', update);
+      if (update) {
+        this.toastr.success('Update Post successfully.')
+        console.log('update', update);
+      } else {
+        this.toastr.error('Please Try Again', 'Post Not Updated.')
+      }
     });
   }
+  //Update Post end
+
+  public search() {
+
+
+    fromEvent(this.searchText.nativeElement, 'keyup').pipe(debounceTime(1000), distinctUntilChanged()).subscribe((e: any) => {
+      this.apollo.watchQuery({
+        query: this.filter,
+        variables: {
+          options: {
+            search: {
+              q: this.searchText.nativeElement.value
+            }
+          }
+        }
+      }).valueChanges.subscribe((data: any) => {
+        if (this.searchText.nativeElement.value == "") {
+          this.getAllPosts();
+        } else {
+          this.getAllData = data.data.posts.data;
+          console.log('data', data.data.posts.data);
+        }
+      })
+    })
+
+
+
+
+  }
+
+
 }
