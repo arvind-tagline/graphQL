@@ -12,10 +12,13 @@ export class InfoComponent implements OnInit {
 
   public searchText: string = '';
   public createPost!: FormGroup;
+  public updatePostF!: FormGroup;
   public getAllData: any;
   public title: string = '';
   public id: string = '';
   public body: string = '';
+  public postId: any;
+
 
   //Show api post
   public getData = gql`
@@ -32,7 +35,7 @@ export class InfoComponent implements OnInit {
       }
     }`
 
-  
+
   //create Post 
   public crePost = gql`mutation(
     $input: CreatePostInput!
@@ -49,12 +52,30 @@ export class InfoComponent implements OnInit {
     deletePost(id: $id)
   }`
 
+  //Update Post
+  public updatePostQL = gql`
+  
+  mutation (
+  $id: ID!,
+  $input: UpdatePostInput!
+) {
+  updatePost(id: $id, input: $input) {
+    id
+    body
+  }
+}
+`
   constructor(private apollo: Apollo, private fb: FormBuilder, private toastr: ToastrService) {
     this.createPost = this.fb.group({
       title: '',
       body: ''
     });
-   }
+
+    this.updatePostF = this.fb.group({
+      title: '',
+      body: ''
+    });
+  }
 
   ngOnInit(): void {
     this.apollo.watchQuery({
@@ -78,7 +99,7 @@ export class InfoComponent implements OnInit {
     });
   }
 
-//Create post
+  //Create post
   public addPost() {
     this.apollo.mutate({
       mutation: this.crePost,
@@ -95,10 +116,8 @@ export class InfoComponent implements OnInit {
   }
 
 
-//delete post
+  //delete post
   public delPost(id: any) {
-    console.log('id', id);
-
     this.apollo.mutate({
       mutation: this.deletePost,
       variables: {
@@ -109,4 +128,26 @@ export class InfoComponent implements OnInit {
     })
   }
 
+  public getPostId(id: any) {
+    this.postId = id;
+    this.open(id);
+    this.updatePostF = this.fb.group({
+      title: this.title,
+      body: this.body
+    })
+  }
+
+  public updatePost(id: any) {
+    this.apollo.mutate({
+      mutation: this.updatePostQL,
+      variables: {
+      id: id,
+        input: {
+          body: this.updatePostF.value.body
+        }
+      }
+    }).subscribe(update => {
+      console.log('update', update);
+    });
+  }
 }
