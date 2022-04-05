@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Apollo } from 'apollo-angular';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +7,12 @@ import { Apollo } from 'apollo-angular';
 })
 export class AppComponent {
   title = 'graphQL';
+  public selectComponent: any;
 
-  constructor(private apollo: Apollo) {}
+  constructor() { }
+  
+
+  public toggle(): void{
+    
+  }
 }

@@ -74,6 +74,18 @@ export class InfoComponent implements OnInit, AfterViewInit {
     }
   }`
 
+  //pagination
+  public pagination = gql`query Posts($options: PageQueryOptions) {
+  posts(options: $options) {
+    data {
+      id
+      title
+      body
+    }
+    }
+  }`
+
+  
   constructor(private apollo: Apollo, private fb: FormBuilder, private toastr: ToastrService) {
     this.createPost = this.fb.group({
       title: '',
@@ -88,13 +100,26 @@ export class InfoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.getAllPosts();
+    this.paginat();
   }
 
-  ngAfterViewInit() {
+  public paginat(): void{
+    this.apollo.query({
+      query: this.pagination,
+      variables: {
+        "options": {
+          "paginate": {
+            "limit": 10
+          }
+        }
+      }
+    });
+  }
+  ngAfterViewInit():void {
     this.search()
   }
 
-  public getAllPosts() {
+  public getAllPosts():void {
     this.apollo.watchQuery({
       query: this.getData,
     }).valueChanges.subscribe((res: any) => {
@@ -109,7 +134,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
   }
 
   // Show data by id
-  public open(id: string) {
+  public open(id: string):void {
     this.getAllData.find((e: any) => {
       if (e.id == id) {
         this.title = e.title;
@@ -120,7 +145,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
   }
 
   //Create post
-  public addPost() {
+  public addPost():void {
     this.apollo.mutate({
       mutation: this.crePost,
       variables: {
@@ -142,7 +167,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
 
 
   //delete post
-  public delPost(id: any) {
+  public delPost(id: any):void {
     this.apollo.mutate({
       mutation: this.deletePost,
       variables: {
@@ -159,7 +184,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
   }
 
   //Update Post start
-  public getPostId(id: any) {
+  public getPostId(id: any):void {
     this.postId = id;
     this.open(id);
     this.updatePostF = this.fb.group({
@@ -168,7 +193,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
     })
   }
 
-  public updatePost(id: any) {
+  public updatePost(id: any):void {
     this.apollo.mutate({
       mutation: this.updatePostQL,
       variables: {
@@ -188,9 +213,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
   }
   //Update Post end
 
-  public search() {
-
-
+  public search():void {
     fromEvent(this.searchText.nativeElement, 'keyup').pipe(debounceTime(1000), distinctUntilChanged()).subscribe((e: any) => {
       this.apollo.watchQuery({
         query: this.filter,
@@ -208,12 +231,8 @@ export class InfoComponent implements OnInit, AfterViewInit {
           this.getAllData = data.data.posts.data;
           console.log('data', data.data.posts.data);
         }
-      })
-    })
-
-
-
-
+      });
+    });
   }
 
 

@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { UsersComponent } from './users/users.component';
 
 
 const uri: string = 'https://graphqlzero.almansi.me/api';
@@ -24,7 +25,8 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
 @NgModule({
   declarations: [
     AppComponent,
-    InfoComponent
+    InfoComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,
