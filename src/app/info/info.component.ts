@@ -43,4 +43,16 @@ export class InfoComponent implements OnInit {
       console.log('res', res.data.posts.data);
     });
   }
+
+
+  // Show data by id
+  public open(id: string) {
+    this.getAllData.find((e: any) => {
+      if (e.id == id) {
+        this.title = e.title;
+        this.id = e.id;
+        this.body = e.body;
+      }
+    });
+  }
 }
