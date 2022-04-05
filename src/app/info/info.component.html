@@ -1,0 +1,23 @@
+<div class="m-3">
+    <table class="table">
+        <thead>
+            <tr class="text-center">
+                <th scope="col">Id</th>
+                <th scope="col">Title</th>
+                <th scope="col">Body</th>
+                <th>Update</th>
+                <th>Delete</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of getAllData">
+                <td>{{data.id}}</td>
+                <td>{{data.title}}</td>
+                <td>{{data.body}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
