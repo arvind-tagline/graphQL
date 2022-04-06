@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Apollo, gql } from 'apollo-angular';
+import { ToastrService } from 'ngx-toastr';
 import { debounceTime, distinctUntilChanged, fromEvent } from 'rxjs';
 
 @Component({
@@ -28,27 +29,14 @@ export class UsersComponent implements OnInit , AfterViewInit{
       name
       username
       email
+     company {
+        name
+      }
     }
-     meta {
-          totalCount
-        }
   }
   }`
 
-
-  //Create user
-  public createUsers = gql`mutation(
-    $input: CreateUserInput!
-  ) {
-    createUser(input: $input) {
-      id
-      name
-      username
-      email
-    }
-  }`
-
-  constructor(private apollo: Apollo, private fb:FormBuilder) { 
+  constructor(private apollo: Apollo, private fb:FormBuilder, private toast: ToastrService) { 
     this.createUser = this.fb.group({
       name: '',
       username: '',
@@ -93,6 +81,16 @@ export class UsersComponent implements OnInit , AfterViewInit{
   }
 
 //Create User
+  public createUsers = gql`mutation(
+    $input: CreateUserInput!
+  ) {
+    createUser(input: $input) {
+      id
+      name
+      username
+      email
+    }
+  }`
   public addUser(): void{
     this.apollo.mutate({
       mutation: this.createUsers,
@@ -104,6 +102,11 @@ export class UsersComponent implements OnInit , AfterViewInit{
         }
       }
     }).subscribe((res: any) => {
+      if (res) {
+        this.toast.success('User created successfully.')
+      } else {
+        this.toast.error('User not created.')
+      }
       console.log('res', res)
     })
   }
@@ -120,12 +123,12 @@ export class UsersComponent implements OnInit , AfterViewInit{
       }
     }).subscribe(del => {
       console.log('del', del)
-      // if (del) {
-      //   this.toastr.success('Deleted Post successfully')
-      //   console.log('delete', del)
-      // } else {
-      //   this.toastr.error('Please Try Again', 'Post Not Deleted.');
-      // }
+      if (del) {
+        this.toast.success('Deleted User successfully')
+        console.log('delete', del)
+      } else {
+        this.toast.error('Please Try Again', 'User Not Deleted.');
+      }
     })
   }
 
@@ -164,12 +167,12 @@ export class UsersComponent implements OnInit , AfterViewInit{
       }
     }).subscribe(update => {
       console.log('update', update);
-      // if (update) {
-      //   this.toastr.success('Update Post successfully.')
-      //   console.log('update', update);
-      // } else {
-      //   this.toastr.error('Please Try Again', 'Post Not Updated.')
-      // }
+      if (update) {
+        this.toast.success('Update User successfully.')
+        console.log('update', update);
+      } else {
+        this.toast.error('Please Try Again', 'User Not Updated.')
+      }
     });
   }
   //Update Post end
@@ -190,7 +193,7 @@ export class UsersComponent implements OnInit , AfterViewInit{
     }
   }`
   public search(): void {
-    fromEvent(this.searchText.nativeElement, 'keyup').pipe(debounceTime(1000), distinctUntilChanged()).subscribe((e: any) => {
+    fromEvent(this.searchText.nativeElement, 'keyup').pipe(debounceTime(500), distinctUntilChanged()).subscribe((e: any) => {
       this.apollo.watchQuery({
         query: this.filter,
         variables: {

@@ -1,12 +1,11 @@
 <div class="m-3">
     <h1 class="text-center">GraphQL User</h1>
     <div class="row justify-content-center">
+        <div class="col-sm-2">
+            <button class="btn btn-success" routerLink="/post">Post Demo</button>
+        </div>
         <div class="col-sm-4">
-            <div class="row d-flex">
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search...." #searchText>
-                </div>
-            </div>
+            <input type="text" class="form-control" placeholder="Search...." #searchText>
         </div>
         <div class="col-sm-1 align-items-center">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
@@ -22,9 +21,10 @@
                 <th scope="col">Name</th>
                 <th scope="col">UserName</th>
                 <th scope="col">Email</th>
-                <th>Update</th>
-                <th>Delete</th>
-                <th>View</th>
+                <th scope="col">Company Name</th>
+                <th class="text-center">Update</th>
+                <th class="text-center">Delete</th>
+                <th class="text-center">View</th>
             </tr>
         </thead>
         <tbody>
@@ -33,11 +33,12 @@
                 <td>{{user.name}}</td>
                 <td>{{user.username}}</td>
                 <td>{{user.email}}</td>
-                <td><i class="fa fa-edit text-warning" data-bs-toggle="modal" data-bs-target="#updateModal"
+                <td data-bs-toggle="tooltip" data-bs-placement="right"  title={{user.company.name}}>{{user.company.name}}</td>
+                <td class="text-center"><i class="fa fa-edit text-warning" data-bs-toggle="modal" data-bs-target="#updateModal"
                         (click)="getPostId(user.id)"></i></td>
-                <td><i class="fa fa-trash text-danger" (click)="delPost(user.id)"></i></td>
-                <td data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="open(user.id)"><i
-                        class="fas fa-eye"></i>
+                <td class="text-center"><i class="fa fa-trash text-danger" (click)="delPost(user.id)"></i></td>
+                <td class="text-center" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="open(user.id)"><i
+                        class="fas fa-eye text-success"></i>
                 </td>
             </tr>
         </tbody>
@@ -103,7 +104,8 @@
                             placeholder="Enter Name">
                         <input type="text" class="form-control mt-3" id="userName" formControlName="username"
                             placeholder="Enter UserName">
-                            <input type="text" class="form-control mt-3" id="email" formControlName="email" placeholder="Enter Email">
+                        <input type="text" class="form-control mt-3" id="email" formControlName="email"
+                            placeholder="Enter Email">
                     </form>
                 </div>
                 <div class="modal-footer">

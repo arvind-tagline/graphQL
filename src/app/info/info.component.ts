@@ -58,6 +58,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
   public updatePostQL = gql`mutation ($id: ID!, $input: UpdatePostInput!) {
     updatePost(id: $id, input: $input) {
       id
+      title
       body
     }
   }`
@@ -199,6 +200,7 @@ export class InfoComponent implements OnInit, AfterViewInit {
       variables: {
         id: id,
         input: {
+          title: this.updatePostF.value.title,
           body: this.updatePostF.value.body
         }
       }
